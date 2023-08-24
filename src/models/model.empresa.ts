@@ -22,6 +22,39 @@ async function Inserir(empresa: Omit<Empresa, "id">) {
   return novaEmpresa;
 }
 
+async function Editar(empresa: Empresa) {
+  const errors: FieldError[] = await validationEmpresa.ValidateUpdateEmpresa(
+    empresa
+  );
+
+  if (errors.length > 0) throw new FieldException(errors);
+
+  const data: any = {};
+  if (empresa.CNPJ !== undefined) {
+    data.CNPJ = empresa.CNPJ;
+  }
+  if (empresa.nome !== undefined) {
+    data.nome = empresa.nome;
+  }
+  if (empresa.contrato !== undefined) {
+    data.contrato = empresa.contrato;
+  }
+  if (empresa.razao_social !== undefined) {
+    data.razao_social = empresa.razao_social;
+  }
+
+  if (empresa.ativo !== undefined) {
+    data.ativo = empresa.ativo;
+  }
+
+  const updates = await prismaClient.empresas.update({
+    where: { id: empresa.id },
+    data,
+  });
+
+  return updates;
+}
+
 async function Listar(params: Empresa) {
   const where: any = {};
   if (params.id !== undefined) {
@@ -43,6 +76,16 @@ async function Listar(params: Empresa) {
     where.OR = where.OR || [];
     where.OR.push({ razao_social: params.razao_social });
   }
+  if (params.ativo !== undefined) {
+    where.OR = where.OR || [];
+    where.OR.push({ ativo: params.ativo });
+  }
+
+  const empresas = await prismaClient.empresas.findMany({
+    where,
+  });
+
+  return empresas;
 }
 
-export default { Inserir, Listar };
+export default { Inserir, Listar, Editar };

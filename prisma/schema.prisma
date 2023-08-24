@@ -15,8 +15,9 @@ model Empresas {
   nome String
   razao_social String
   contrato String
-  CNPJ String @db.Char(14)
+  CNPJ String @db.Char(14) @unique
   colaboradores Pessoas[]
+  ativo Boolean @default(true)
 
   @@map("empresa")
 }
@@ -24,11 +25,11 @@ model Empresas {
 model Pessoas {
   id Int @id @default(autoincrement())
   nome String
-  CPF String @db.Char(14) @unique
+  CPF String @db.Char(11) @unique
   id_empresa Int
-  cargo String
   empresa Empresas @relation(fields: [id_empresa], references: [id])  
   login Login?
+  ativo Boolean @default(true)
 
   @@map("pessoa")
 }
@@ -39,4 +40,18 @@ model Login {
   senha String
   id_pessoa Int @unique
   pessoa Pessoas @relation(fields: [id_pessoa], references: [id])
+  id_role Int
+  role Roles @relation(fields: [id_role], references: [id])
+  ativo Boolean @default(true)
+
+  @@map("login")
+}
+
+model Roles {
+  id Int @id @default(autoincrement())
+  descricao String @unique
+  login Login[]
+  ativo Boolean @default(true)
+
+  @@map("roles")
 }

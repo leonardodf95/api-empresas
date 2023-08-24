@@ -6,6 +6,7 @@ async function ValidateInserirEmpresa(
   empresa: Omit<Empresa, "id">
 ): Promise<FieldError[]> {
   const errors: FieldError[] = [];
+
   if (!empresa.CNPJ) {
     errors.push({
       field: "cnpj",
@@ -45,4 +46,35 @@ async function ValidateInserirEmpresa(
   return errors;
 }
 
-export default { ValidateInserirEmpresa };
+async function ValidateUpdateEmpresa(empresa: Empresa): Promise<FieldError[]> {
+  const errors: FieldError[] = [];
+
+  if (!empresa.id) {
+    errors.push({
+      field: "id",
+      message: "ID não informado",
+    });
+  }
+
+  if (!empresa.CNPJ) {
+    errors.push({
+      field: "cnpj",
+      message: "CNPJ não informado",
+    });
+  }
+
+  const cnpjCadastrado = await prismaClient.empresas.count({
+    where: { CNPJ: empresa.CNPJ },
+  });
+
+  if (cnpjCadastrado) {
+    errors.push({
+      field: "cnpj",
+      message: "CNPJ já cadastrado!",
+    });
+  }
+
+  return errors;
+}
+
+export default { ValidateInserirEmpresa, ValidateUpdateEmpresa };

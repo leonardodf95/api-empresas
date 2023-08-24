@@ -1,7 +1,8 @@
 export default interface Empresa {
-  id: Number;
+  id: number;
   nome: string;
   razao_social: string;
   contrato: string;
   CNPJ: string;
+  ativo: boolean;
 }
