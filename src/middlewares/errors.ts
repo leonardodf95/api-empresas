@@ -9,9 +9,9 @@ export default async function errorsMiddleware(
   next: NextFunction
 ) {
   if (err instanceof FieldException)
-    return res.send(err.errors).status(err.statusCode);
+    return res.status(err.statusCode).send(err.errors);
 
-  return res.send({
+  return res.status(500).send({
     message: genericExceptionMessage,
   });
 }

@@ -57,9 +57,7 @@ async function Editar(empresa: Empresa) {
 
 async function Listar(params: Empresa) {
   const where: any = {};
-  if (params.id !== undefined) {
-    where.OR = [{ id: params.id }];
-  }
+
   if (params.CNPJ !== undefined) {
     where.OR = where.OR = where.OR || [];
     where.OR.push({ CNPJ: params.CNPJ });
@@ -88,4 +86,14 @@ async function Listar(params: Empresa) {
   return empresas;
 }
 
-export default { Inserir, Listar, Editar };
+async function PesquisaPorID(id: string) {
+  const parsedID = parseInt(id);
+
+  const empresa = await prismaClient.empresas.findUnique({
+    where: { id: parsedID },
+  });
+
+  return empresa;
+}
+
+export default { Inserir, Listar, Editar, PesquisaPorID };

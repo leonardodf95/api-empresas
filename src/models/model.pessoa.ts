@@ -50,9 +50,7 @@ async function Editar(pessoa: Pessoa) {
 
 async function Listar(params: Pessoa) {
   const where: any = {};
-  if (params.id !== undefined) {
-    where.OR = [{ id: params.id }];
-  }
+
   if (params.CPF !== undefined) {
     where.OR = where.OR = where.OR || [];
     where.OR.push({ CPF: params.CPF });
@@ -77,4 +75,14 @@ async function Listar(params: Pessoa) {
   return pessoas;
 }
 
-export default { Inserir, Editar, Listar };
+async function PesquisaPorID(id: string) {
+  const parsedID = parseInt(id);
+
+  const pessoa = await prismaClient.pessoas.findUnique({
+    where: { id: parsedID },
+  });
+
+  return pessoa;
+}
+
+export default { Inserir, Editar, Listar, PesquisaPorID };

@@ -17,5 +17,10 @@ async function Listar(req: Request, res: Response) {
   const Empresas = await modelEmpresa.Listar(filter as unknown as Empresa);
   return res.status(200).send(Empresas);
 }
+async function PesquisaPorID(req: Request, res: Response) {
+  const { id } = req.params;
+  const empresa = await modelEmpresa.PesquisaPorID(id);
+  return res.status(200).send(empresa);
+}
 
-export default { Inserir, Listar, Editar };
+export default { Inserir, Listar, Editar, PesquisaPorID };

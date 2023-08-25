@@ -12,6 +12,17 @@ async function ValidateInserirEmpresa(
       field: "cnpj",
       message: "CNPJ não informado",
     });
+  } else {
+    const cnpjCadastrado = await prismaClient.empresas.count({
+      where: { CNPJ: empresa.CNPJ },
+    });
+
+    if (cnpjCadastrado) {
+      errors.push({
+        field: "cnpj",
+        message: "CNPJ já cadastrado!",
+      });
+    }
   }
   if (!empresa.nome) {
     errors.push({
@@ -32,17 +43,6 @@ async function ValidateInserirEmpresa(
     });
   }
 
-  const cnpjCadastrado = await prismaClient.empresas.count({
-    where: { CNPJ: empresa.CNPJ },
-  });
-
-  if (cnpjCadastrado) {
-    errors.push({
-      field: "cnpj",
-      message: "CNPJ já cadastrado!",
-    });
-  }
-
   return errors;
 }
 
@@ -56,22 +56,19 @@ async function ValidateUpdateEmpresa(empresa: Empresa): Promise<FieldError[]> {
     });
   }
 
-  if (!empresa.CNPJ) {
-    errors.push({
-      field: "cnpj",
-      message: "CNPJ não informado",
+  if (empresa.CNPJ) {
+    const cnpjCadastrado = await prismaClient.empresas.count({
+      where: {
+        AND: { CNPJ: empresa.CNPJ, NOT: { id: empresa.id } },
+      },
     });
-  }
 
-  const cnpjCadastrado = await prismaClient.empresas.count({
-    where: { CNPJ: empresa.CNPJ },
-  });
-
-  if (cnpjCadastrado) {
-    errors.push({
-      field: "cnpj",
-      message: "CNPJ já cadastrado!",
-    });
+    if (cnpjCadastrado) {
+      errors.push({
+        field: "cnpj",
+        message: "CNPJ já cadastrado!",
+      });
+    }
   }
 
   return errors;

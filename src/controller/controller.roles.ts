@@ -17,5 +17,9 @@ async function Editar(req: Request, res: Response) {
   const updates = await modelRoles.Editar(req.body as RoleDto);
   return res.status(201).send(updates);
 }
-
-export default { Listar, Inserir, Editar };
+async function PesquisaPorID(req: Request, res: Response) {
+  const { id } = req.params;
+  const role = await modelRoles.PesquisaPorID(id);
+  return res.status(200).send(role);
+}
+export default { Listar, Inserir, Editar, PesquisaPorID };

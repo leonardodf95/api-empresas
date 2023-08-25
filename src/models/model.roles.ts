@@ -54,9 +54,7 @@ async function Editar(role: RoleDto) {
 
 async function Listar(params: RoleDto) {
   const where: any = {};
-  if (params.id !== undefined) {
-    where.OR = [{ id: params.id }];
-  }
+
   if (params.descricao !== undefined) {
     where.OR = where.OR = where.OR || [];
     where.OR.push({ descricao: params.descricao });
@@ -73,4 +71,14 @@ async function Listar(params: RoleDto) {
   return roles;
 }
 
-export default { Inserir, Editar, Listar };
+async function PesquisaPorID(id: string) {
+  const parsedID = parseInt(id);
+
+  const role = await prismaClient.roles.findUnique({
+    where: { id: parsedID },
+  });
+
+  return role;
+}
+
+export default { Inserir, Editar, Listar, PesquisaPorID };

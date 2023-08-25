@@ -18,4 +18,10 @@ async function Listar(req: Request, res: Response) {
   return res.status(200).send(pessoas);
 }
 
-export default { Inserir, Editar, Listar };
+async function PesquisaPorID(req: Request, res: Response) {
+  const { id } = req.params;
+  const pessoa = await modelPessoa.PesquisaPorID(id);
+  return res.status(200).send(pessoa);
+}
+
+export default { Inserir, Editar, Listar, PesquisaPorID };
