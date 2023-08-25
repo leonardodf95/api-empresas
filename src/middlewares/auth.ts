@@ -41,7 +41,7 @@ export async function isAuthenticated(
       role: id_role,
     };
 
-    await next();
+    return next();
   } catch {
     throw new AuthException("Token inválido!");
   }
