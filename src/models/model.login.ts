@@ -1,9 +1,11 @@
-import { hash } from "bcrypt";
+import { compare, hash } from "bcrypt";
 import { prismaClient } from "../database/PrismaClient";
 import FieldError from "../dtos/fieldError";
 import Login from "../dtos/loginDto";
 import FieldException from "../exceptions/fieldException";
 import validationLogin from "../validations/validationLogin";
+import AuthDto from "../dtos/authDto";
+import { Secret, sign } from "jsonwebtoken";
 
 async function Inserir(login: Login) {
   const errors: FieldError[] = await validationLogin.ValidateInserirLogin(
@@ -50,4 +52,35 @@ async function Editar(login: Login) {
   return updates;
 }
 
-export default { Inserir, Editar };
+async function Login(auth: AuthDto) {
+  const errors: FieldError[] = validationLogin.ValidationLoginFields(auth);
+
+  if (errors.length > 0) throw new FieldException(errors);
+
+  const usuario = await prismaClient.login.findUnique({
+    where: { login: auth.login },
+  });
+
+  if (!usuario) {
+    throw new Error("Usuário e/ou senha inválido(s)");
+  }
+
+  const isValid = await compare(auth.password, usuario.senha);
+
+  if (!isValid) {
+    throw new Error("Usuário e/ou senha inválido(s)");
+  }
+  const SignKey = process.env.JWT_Sign_Key;
+
+  const jwt = sign(
+    { login: usuario.login, id_role: usuario.id_role },
+    SignKey as Secret,
+    { expiresIn: "10h" }
+  );
+
+  delete usuario.senha;
+
+  return { ...usuario, jwt };
+}
+
+export default { Inserir, Editar, Login };

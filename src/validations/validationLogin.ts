@@ -1,6 +1,7 @@
 import { prismaClient } from "../database/PrismaClient";
 import Login from "../dtos/loginDto";
 import FieldError from "../dtos/fieldError";
+import AuthDto from "../dtos/authDto";
 
 async function ValidateInserirLogin(
   login: Omit<Login, "id">
@@ -67,4 +68,27 @@ async function ValidateUpdateLogin(
   return errors;
 }
 
-export default { ValidateInserirLogin, ValidateUpdateLogin };
+function ValidationLoginFields(auth: AuthDto): FieldError[] {
+  const errors: FieldError[] = [];
+
+  if (!auth.login) {
+    errors.push({
+      field: "login",
+      message: "Login não informado",
+    });
+  }
+  if (!auth.password) {
+    errors.push({
+      field: "senha",
+      message: "Senha não informada",
+    });
+  }
+
+  return errors;
+}
+
+export default {
+  ValidateInserirLogin,
+  ValidateUpdateLogin,
+  ValidationLoginFields,
+};

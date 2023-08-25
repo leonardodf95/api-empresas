@@ -14,6 +14,7 @@ export async function isAuthenticated(
   res: Response,
   next: NextFunction
 ) {
+  if (req.path === "/v1/login" && req.method === "POST") return next();
   const authHeader = req.headers.authorization;
 
   if (!authHeader) {
@@ -35,7 +36,7 @@ export async function isAuthenticated(
 
     const { login, id_role } = decodedToken as unknown as JwtPayload;
 
-    req.user = {
+    req.usuario = {
       login,
       role: id_role,
     };
