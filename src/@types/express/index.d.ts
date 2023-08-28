@@ -7,6 +7,7 @@ declare global {
         login: string;
         role: number;
         id_empresa: number;
+        cnpj: string;
       };
     }
   }

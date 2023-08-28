@@ -59,7 +59,7 @@ async function Listar(params: Empresa) {
   const where: any = {};
 
   if (params.CNPJ !== undefined) {
-    where.OR = where.OR = where.OR || [];
+    where.OR = where.OR || [];
     where.OR.push({ CNPJ: params.CNPJ });
   }
   if (params.nome !== undefined) {

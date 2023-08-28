@@ -1,4 +1,5 @@
 import { prismaClient } from "../database/PrismaClient";
+import Empresa from "../dtos/empresaDto";
 import FieldError from "../dtos/fieldError";
 import Pessoa from "../dtos/pessoaDto";
 import FieldException from "../exceptions/fieldException";
@@ -6,7 +7,6 @@ import validationPessoa from "../validations/validationPessoa";
 
 async function Inserir(pessoa: Pessoa) {
   const errors: FieldError[] = await validationPessoa.validatePessoa(pessoa);
-  console.log("pessoa :>> ", pessoa);
 
   if (errors.length > 0) throw new FieldException(errors);
 
@@ -76,7 +76,7 @@ async function Listar(params: Pessoa) {
   return pessoas;
 }
 
-async function PesquisaPorID(id: string) {
+async function PesquisaPorID(id: string): Promise<Pessoa> {
   const parsedID = parseInt(id);
 
   const pessoa = await prismaClient.pessoas.findUnique({
@@ -86,4 +86,29 @@ async function PesquisaPorID(id: string) {
   return pessoa;
 }
 
-export default { Inserir, Editar, Listar, PesquisaPorID };
+async function PesquisaPorEmpresa(
+  empresa: Omit<Empresa, "nome" | "razao_social" | "ativo" | "contrato">
+) {
+  const filters: any = {};
+
+  if (empresa.id) {
+    filters.OR = filters.OR || [];
+    filters.OR.push({ id: Number(empresa.id) });
+  }
+  if (empresa.CNPJ) {
+    filters.OR = filters.OR || [];
+    filters.OR.push({ CNPJ: empresa.CNPJ });
+  }
+  const Empresa = await prismaClient.empresas.findMany({
+    where: filters,
+    include: {
+      colaboradores: {
+        orderBy: { id: "asc" },
+      },
+    },
+  });
+
+  return Empresa;
+}
+
+export default { Inserir, Editar, Listar, PesquisaPorID, PesquisaPorEmpresa };

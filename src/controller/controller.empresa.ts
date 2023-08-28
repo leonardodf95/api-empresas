@@ -27,14 +27,25 @@ async function Editar(req: Request, res: Response) {
 }
 
 async function Listar(req: Request, res: Response) {
-  const filter = req.query;
-  const Empresas = await modelEmpresa.Listar(filter as unknown as Empresa);
+  if (req.usuario.role === 1) {
+    const filter = req.query;
+    const Empresas = await modelEmpresa.Listar(filter as unknown as Empresa);
+    return res.status(200).send(Empresas);
+  }
 
   if (req.usuario.role !== 1) {
+    const filter: Omit<
+      Empresa,
+      "nome" | "razao_social" | "contrato" | "ativo"
+    > = {
+      id: req.usuario.id_empresa,
+      CNPJ: req.usuario.cnpj,
+    };
+    const Empresas = await modelEmpresa.Listar(filter as unknown as Empresa);
     const Response = Empresas.find((x) => x.id === req.usuario.id_empresa);
+
     return res.status(200).send(Response);
   }
-  return res.status(200).send(Empresas);
 }
 
 async function PesquisaPorID(req: Request, res: Response) {

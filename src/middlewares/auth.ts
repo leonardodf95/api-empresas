@@ -8,6 +8,7 @@ interface JwtPayload {
   login: string;
   id_role: number;
   id_empresa: number;
+  cnpj: string;
 }
 
 export async function isAuthenticated(
@@ -35,13 +36,14 @@ export async function isAuthenticated(
       tokenSignKey as Secret | GetPublicKeyOrSecret
     );
 
-    const { login, id_role, id_empresa } =
+    const { login, id_role, id_empresa, cnpj } =
       decodedToken as unknown as JwtPayload;
 
     req.usuario = {
       login,
       role: id_role,
       id_empresa,
+      cnpj,
     };
 
     return next();

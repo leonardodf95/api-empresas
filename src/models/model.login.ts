@@ -63,6 +63,18 @@ async function Login(auth: AuthDto) {
 
   const usuario = await prismaClient.login.findUnique({
     where: { login: auth.login },
+    include: {
+      pessoa: {
+        select: {
+          id_empresa: true,
+          empresa: {
+            select: {
+              CNPJ: true,
+            },
+          },
+        },
+      },
+    },
   });
 
   if (!usuario) {
@@ -75,17 +87,14 @@ async function Login(auth: AuthDto) {
     throw new Error("Usuário e/ou senha inválido(s)");
   }
 
-  const pessoa = await prismaClient.pessoas.findUnique({
-    where: { id: usuario.id_pessoa },
-  });
-
   const SignKey = process.env.JWT_Sign_Key;
 
   const jwt = sign(
     {
       login: usuario.login,
       id_role: usuario.id_role,
-      id_empresa: pessoa.id_empresa,
+      id_empresa: usuario.pessoa.id_empresa,
+      cnpj: usuario.pessoa.empresa.CNPJ,
     },
     SignKey as Secret,
     { expiresIn: "10h" }
