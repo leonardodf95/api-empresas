@@ -7,6 +7,7 @@ export const JwtSignKey = process.env.JWT_Sign_Key;
 interface JwtPayload {
   login: string;
   id_role: number;
+  id_empresa: number;
 }
 
 export async function isAuthenticated(
@@ -34,11 +35,13 @@ export async function isAuthenticated(
       tokenSignKey as Secret | GetPublicKeyOrSecret
     );
 
-    const { login, id_role } = decodedToken as unknown as JwtPayload;
+    const { login, id_role, id_empresa } =
+      decodedToken as unknown as JwtPayload;
 
     req.usuario = {
       login,
       role: id_role,
+      id_empresa,
     };
 
     return next();

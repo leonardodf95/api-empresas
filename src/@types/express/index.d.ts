@@ -6,6 +6,7 @@ declare global {
       usuario?: {
         login: string;
         role: number;
+        id_empresa: number;
       };
     }
   }

@@ -6,6 +6,7 @@ import validationPessoa from "../validations/validationPessoa";
 
 async function Inserir(pessoa: Pessoa) {
   const errors: FieldError[] = await validationPessoa.validatePessoa(pessoa);
+  console.log("pessoa :>> ", pessoa);
 
   if (errors.length > 0) throw new FieldException(errors);
 

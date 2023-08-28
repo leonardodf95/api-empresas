@@ -25,6 +25,8 @@ async function Inserir(login: Login) {
     },
   });
 
+  delete novoLogin.senha;
+
   return novoLogin;
 }
 
@@ -44,10 +46,12 @@ async function Editar(login: Login) {
     data.ativo = login.ativo;
   }
 
-  const updates = await prismaClient.pessoas.update({
+  const updates = await prismaClient.login.update({
     where: { id: login.id },
     data,
   });
+
+  delete updates.senha;
 
   return updates;
 }
@@ -70,10 +74,19 @@ async function Login(auth: AuthDto) {
   if (!isValid) {
     throw new Error("Usuário e/ou senha inválido(s)");
   }
+
+  const pessoa = await prismaClient.pessoas.findUnique({
+    where: { id: usuario.id_pessoa },
+  });
+
   const SignKey = process.env.JWT_Sign_Key;
 
   const jwt = sign(
-    { login: usuario.login, id_role: usuario.id_role },
+    {
+      login: usuario.login,
+      id_role: usuario.id_role,
+      id_empresa: pessoa.id_empresa,
+    },
     SignKey as Secret,
     { expiresIn: "10h" }
   );

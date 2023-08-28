@@ -37,6 +37,15 @@ async function validatePessoa(
     });
   }
 
+  const cpfValido = cpfValidation(pessoa.CPF);
+
+  if (!cpfValido) {
+    erros.push({
+      field: "CPF",
+      message: "CPF inválido",
+    });
+  }
+
   return erros;
 }
 
@@ -57,6 +66,59 @@ async function ValidateUpdatePessoa(pessoa: Pessoa): Promise<FieldError[]> {
   }
 
   return erros;
+}
+
+function cpfValidation(cpf: string) {
+  cpf = cpf.replace(/\D/g, "");
+  if (cpf.length !== 11) return false;
+
+  let checkDigit = cpf.substring(0, 9);
+  let checkDigitArray = Array.from(checkDigit);
+  let checkDigitArrayUnique = Array.from(new Set(checkDigitArray));
+  if (checkDigitArrayUnique.length === 1) {
+    return false;
+  }
+
+  let firstCheckDigit = cpf.substring(9, 10);
+  let firstCheckDigitValidation = validateCheckDigit(
+    checkDigit,
+    firstCheckDigit
+  );
+
+  if (!firstCheckDigitValidation) {
+    return false;
+  }
+
+  let secondCheckDigit = cpf.substring(10, 11);
+  let secondCheckDigitValidation = validateCheckDigit(
+    checkDigit + firstCheckDigit,
+    secondCheckDigit
+  );
+  if (!secondCheckDigitValidation) {
+    return false;
+  }
+
+  return true;
+}
+
+function validateCheckDigit(checkDigit: string, checkDigitToValidate: string) {
+  let sum = 0;
+  let weight = checkDigit.length + 1;
+  for (let i = 0; i < checkDigit.length; i++) {
+    sum += parseInt(checkDigit[i]) * weight;
+    weight--;
+  }
+  let rest = sum % 11;
+  if (rest < 2) {
+    rest = 0;
+  } else {
+    rest = 11 - rest;
+  }
+  if (rest !== parseInt(checkDigitToValidate)) {
+    return false;
+  } else {
+    return true;
+  }
 }
 
 export default { validatePessoa, ValidateUpdatePessoa };
